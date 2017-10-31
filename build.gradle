@@ -11,6 +11,7 @@ buildscript {
 
 plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.1'
+    id 'application'
 }
 
 apply plugin: 'kotlin'
@@ -31,6 +32,11 @@ repositories {
     mavenLocal()
     jcenter()
 }
+
+// Project configuration
+
+group = group
+version = version
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
