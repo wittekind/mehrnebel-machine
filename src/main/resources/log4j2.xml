@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn">
+    <Appenders>
+        <Console name="Console_With_Time" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{ISO8601} %highlight{[%c{1.}] %level} %message%n"/>
+        </Console>
+        <File name="File_With_Time" fileName="/var/log/mehrnebel/machine.log">
+            <PatternLayout pattern="%d{ISO8601} %highlight{[%c{1.}] %level} %message%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Logger name="io.wittekind.mehrnebel" level="debug" additivity="true">
+            <AppenderRef ref="Console_With_Time"/>
+            <AppenderRef ref="File_With_Time"/>
+        </Logger>
+
+        <!-- Alle restlichen Ausgaben -->
+        <Root level="error">
+        </Root>
+    </Loggers>
+</Configuration>

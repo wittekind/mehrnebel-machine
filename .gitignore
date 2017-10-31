@@ -1,0 +1,8 @@
+jenkins-release.properties
+*.DS_Store
+.idea/
+.gradle/
+build/
+file-uploads/
+.vertx/
+out/
