@@ -1,10 +1,11 @@
 package io.wittekind.mehrnebel.machine
 
-import io.vertx.core.AbstractVerticle
+import io.vertx.rxjava.core.AbstractVerticle
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.Future
-import io.vertx.ext.web.Router
-import io.vertx.ext.web.handler.BodyHandler
+import io.vertx.rxjava.ext.web.Router
+import io.vertx.rxjava.ext.web.handler.BodyHandler
+import io.wittekind.mehrnebel.machine.gpio.GpioVerticle
 import io.wittekind.mehrnebel.machine.machine.MachineVerticle
 import io.wittekind.mehrnebel.machine.util.FailureHandler
 import kotlinx.coroutines.experimental.CommonPool
@@ -27,9 +28,11 @@ class MainVerticle : AbstractVerticle() {
         logger.info("Deploying verticles...")
 
         val machineVerticle = MachineVerticle(router)
+        val gpioVerticle = GpioVerticle()
 
         launch(CommonPool) {
-            vertx.asyncDeployVerticle(machineVerticle, DeploymentOptions().setConfig(config()))
+            vertx.deployVerticleInstance(gpioVerticle, DeploymentOptions().setConfig(config()))
+            vertx.deployVerticleInstance(machineVerticle, DeploymentOptions().setConfig(config()))
 
             logger.info("Starting http server...")
             val port = config().getInteger("http.port", 8060)

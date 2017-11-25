@@ -1,39 +1,48 @@
 package io.wittekind.mehrnebel.machine
 
-import io.vertx.core.AbstractVerticle
 import io.vertx.core.DeploymentOptions
-import io.vertx.core.Vertx
-import io.vertx.core.http.HttpServer
-import io.vertx.ext.web.Route
-import io.vertx.ext.web.RoutingContext
+import io.vertx.core.json.Json
+import io.vertx.rxjava.core.RxHelper
+import io.vertx.rxjava.core.eventbus.Message
+import io.vertx.rxjava.core.eventbus.MessageConsumer
+import io.vertx.rxjava.core.http.HttpServerResponse
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.launch
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlinx.coroutines.experimental.rx1.await
+import kotlinx.coroutines.experimental.rx1.awaitFirst
 
-fun Route.asyncHandler(requestHandler: suspend (RoutingContext) -> Unit) {
-    handler {
+val GPIO_LED_TOPIC = "gpio.led"
+
+fun io.vertx.rxjava.ext.web.Route.asyncHandler(handle: suspend (io.vertx.rxjava.ext.web.RoutingContext) -> Unit) {
+    handler { routingContext ->
         launch(CommonPool) {
             try {
-                requestHandler(it)
+                handle(routingContext)
             } catch (e: Exception) {
-                it.fail(e)
+                routingContext.fail(e)
             }
         }
     }
 }
 
-suspend fun Vertx.asyncDeployVerticle(verticle: AbstractVerticle, options: DeploymentOptions) = suspendCoroutine<String> { cont ->
-    deployVerticle(verticle, options) {
-        if (it.failed()) {
-            cont.resumeWithException(it.cause())
-        } else {
-            cont.resume(it.result())
-        }
-    }
+suspend fun io.vertx.rxjava.core.Vertx.deployVerticleInstance(verticle: io.vertx.rxjava.core.AbstractVerticle,
+                                                              options: DeploymentOptions = DeploymentOptions()): String {
+    return RxHelper.deployVerticle(this, verticle, options).awaitFirst()
 }
 
-suspend fun HttpServer.asyncListen(port: Int) = suspendCoroutine<HttpServer> { cont ->
-    listen(port) {
-        if (it.failed()) cont.resumeWithException(it.cause()) else cont.resume(it.result())
+suspend fun io.vertx.rxjava.core.http.HttpServer.asyncListen(port: Int): io.vertx.rxjava.core.http.HttpServer = rxListen(port).await()
+
+inline fun <reified T> io.vertx.rxjava.ext.web.RoutingContext.decodeBody(): T = Json.decodeValue(bodyAsString, T::class.java)
+
+fun HttpServerResponse.putHeader(name: CharSequence, value: CharSequence): HttpServerResponse {
+    putHeader(name.toString(), value.toString())
+    return this
+}
+
+fun <T> MessageConsumer<T>.asyncHandler(handle: suspend (message: Message<T>) -> Unit) {
+    handler {
+        launch(CommonPool) {
+            handle(it)
+        }
     }
 }

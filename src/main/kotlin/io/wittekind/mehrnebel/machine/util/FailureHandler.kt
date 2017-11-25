@@ -4,7 +4,8 @@ import io.vertx.core.Handler
 import io.vertx.core.http.HttpHeaders
 import io.vertx.core.json.DecodeException
 import io.vertx.core.json.Json
-import io.vertx.ext.web.RoutingContext
+import io.vertx.rxjava.ext.web.RoutingContext
+import io.wittekind.mehrnebel.machine.putHeader
 import org.slf4j.LoggerFactory
 
 class FailureHandler : Handler<RoutingContext> {
