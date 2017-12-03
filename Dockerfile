@@ -23,7 +23,7 @@ RUN apt-get update && \
     apt-get clean
 
 RUN wget http://get.pi4j.com/download/pi4j-1.1.deb && \
-    sudo dpkg -i pi4j
+    sudo dpkg -i pi4j-1.1.deb
 
 WORKDIR /mehrnebel/machine
 
