@@ -19,6 +19,8 @@ RUN apt-get update && \
     apt-get -y install oracle-java8-jdk && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN curl -s get.pi4j.com | sudo bash
+
 WORKDIR /mehrnebel/machine
 
 COPY --from=builder /usr/src/app/build/libs/machine-0.0.1-fat.jar /mehrnebel/machine/app.jar
