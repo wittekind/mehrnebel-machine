@@ -14,10 +14,9 @@ internal class GpioVerticle : AbstractVerticle() {
         val gpio = GpioFactory.getInstance()
         val led = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_17, "TestLed", PinState.LOW)
 
-        vertx.eventBus().consumer<LedSwitchRequest>(GPIO_LED_TOPIC)
+        vertx.eventBus().consumer<Boolean>(GPIO_LED_TOPIC)
                 .asyncHandler {
-                    val request = it.body()
-                    led.setState(request.lightUpLed)
+                    led.setState(it.body())
                 }
     }
 }

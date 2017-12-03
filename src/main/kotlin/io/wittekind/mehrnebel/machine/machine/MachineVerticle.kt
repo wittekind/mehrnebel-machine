@@ -2,6 +2,7 @@ package io.wittekind.mehrnebel.machine.machine
 
 import io.vertx.core.http.HttpHeaders
 import io.vertx.core.json.Json
+import io.vertx.core.json.JsonObject
 import io.vertx.rxjava.core.AbstractVerticle
 import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.RoutingContext
@@ -29,7 +30,7 @@ internal class MachineVerticle(router: Router) : AbstractVerticle() {
 
     private suspend fun switchLed(routingContext: RoutingContext) {
         val request = routingContext.decodeBody<LedSwitchRequest>()
-        vertx.eventBus().publish(GPIO_LED_TOPIC, request)
+        vertx.eventBus().publish(GPIO_LED_TOPIC, request.lightUpLed)
 
         routingContext.response()
                 .setStatusCode(204)
