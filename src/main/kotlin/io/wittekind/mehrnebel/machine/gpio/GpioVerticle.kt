@@ -6,9 +6,12 @@ import com.pi4j.io.gpio.RaspiPin
 import io.vertx.rxjava.core.AbstractVerticle
 import io.wittekind.mehrnebel.machine.GPIO_LED_TOPIC
 import io.wittekind.mehrnebel.machine.asyncHandler
-import io.wittekind.mehrnebel.machine.machine.LedSwitchRequest
+import org.slf4j.LoggerFactory
 
 internal class GpioVerticle : AbstractVerticle() {
+
+    private val logger = LoggerFactory.getLogger(GpioVerticle::class.java)
+
     override fun start() {
 
         val gpio = GpioFactory.getInstance()
@@ -16,7 +19,9 @@ internal class GpioVerticle : AbstractVerticle() {
 
         vertx.eventBus().consumer<Boolean>(GPIO_LED_TOPIC)
                 .asyncHandler {
-                    led.setState(it.body())
+                    val newPinState = it.body()
+                    logger.info("received new pin state [${newPinState}]")
+                    led.setState(newPinState)
                 }
     }
 }
