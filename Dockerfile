@@ -18,7 +18,12 @@ RUN apt-get update && \
     apt-get -y install oracle-java8-jdk && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN curl -s get.pi4j.com | sudo bash
+RUN apt-get update && \
+    apt-get -y install wget && \
+    apt-get clean
+
+RUN wget http://get.pi4j.com/download/pi4j-1.1.deb && \
+    sudo dpkg -r pi4j
 
 WORKDIR /mehrnebel/machine
 
