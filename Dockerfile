@@ -23,5 +23,7 @@ COPY --from=builder /usr/src/app/build/libs/machine-0.0.1-fat.jar /mehrnebel/mac
 
 ADD docker/production.json /mehrnebel/machine/production.json
 
+VOLUME /sys
+
 ENTRYPOINT ["java", "-classpath", ".:classes:/opt/pi4j/lib/'*'", "-jar", "/mehrnebel/machine/app.jar"]
 CMD ["-conf", "/mehrnebel/machine/production.json"]
