@@ -5,6 +5,9 @@ RUN apt-get update && \
     apt-get -y install wget && \
     apt-get clean
 
+RUN dpkg --purge --force-depends ca-certificates-java && \
+    apt-get install ca-certificates-java
+
 RUN wget http://get.pi4j.com/download/pi4j-1.1.deb && \
     sudo dpkg -i pi4j-1.1.deb
 
