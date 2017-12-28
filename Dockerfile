@@ -19,7 +19,7 @@ WORKDIR /usr/src/app
 
 RUN ./gradlew build shadowJar
 
-COPY /usr/src/app/build/libs/machine-0.0.1-fat.jar /mehrnebel/machine/app.jar
+RUN cp /usr/src/app/build/libs/machine-0.0.1-fat.jar /mehrnebel/machine/app.jar
 
 WORKDIR /mehrnebel/machine
 

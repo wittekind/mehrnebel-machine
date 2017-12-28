@@ -11,10 +11,10 @@ buildscript {
 
 plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.1'
-    id 'application'
 }
 
 apply plugin: 'kotlin'
+apply plugin: 'application'
 
 def versions = [
         vertx  : [
@@ -70,6 +70,7 @@ defaultTasks 'shadowJar'
 
 shadowJar {
     classifier = 'fat'
+    mainClassName = 'io.vertx.core.Launcher'
 }
 
 // Application
