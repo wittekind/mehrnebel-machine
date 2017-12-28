@@ -19,9 +19,9 @@ WORKDIR /usr/src/app
 
 RUN ./gradlew build shadowJar
 
-WORKDIR /mehrnebel/machine
-
 COPY /usr/src/app/build/libs/machine-0.0.1-fat.jar /mehrnebel/machine/app.jar
+
+WORKDIR /mehrnebel/machine
 
 ADD docker/production.json /mehrnebel/machine/production.json
 
