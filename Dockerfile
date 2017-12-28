@@ -1,4 +1,4 @@
-FROM resin/rpi-raspian as machine
+FROM resin/rpi-raspbian as machine
 MAINTAINER daniel@wittekind.io
 
 COPY raspberrypi.gpg.key /key/
