@@ -24,13 +24,16 @@ def versions = [
         slf4j  : '1.7.25',
         log4j  : '2.8.2',
         kotlin : '1.1.61',
-        pi4j : '1.1'
+        pi4j : '1.2-SNAPSHOT'
 ]
 
 repositories {
     mavenCentral()
     mavenLocal()
     jcenter()
+    maven {
+        url 'https://oss.sonatype.org/content/groups/public'
+    }
 }
 
 // Project configuration
