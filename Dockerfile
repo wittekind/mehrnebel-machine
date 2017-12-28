@@ -1,11 +1,14 @@
-FROM resin/raspberry-pi-openjdk:8-jdk as machine
+FROM resin/rpi-raspian as machine
 MAINTAINER daniel@wittekind.io
 
-RUN apt-get update && \
-    apt-get -y install wget && \
-    apt-get clean
+COPY raspberrypi.gpg.key /key/
+RUN echo 'deb http://archive.raspberrypi.org/debian/ wheezy main' >> /etc/apt/sources.list.d/raspi.list && \
+    echo oracle-java8-jdk shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+    apt-key add /key/raspberrypi.gpg.key
 
-RUN apt-get upgrade nss-softtokn nss-softtokn-freebl nss-util
+RUN apt-get update && \
+    apt-get -y install wget oracle-java8-jdk && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN wget http://get.pi4j.com/download/pi4j-1.1.deb && \
     sudo dpkg -i pi4j-1.1.deb
