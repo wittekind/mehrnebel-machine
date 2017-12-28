@@ -4,7 +4,7 @@ MAINTAINER daniel@wittekind.io
 COPY raspberrypi.gpg.key /key/
 RUN echo 'deb http://archive.raspberrypi.org/debian/ wheezy main' >> /etc/apt/sources.list.d/raspi.list && \
     echo oracle-java8-jdk shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
-    apt-key add /key/raspberrypi.gpg.key
+    apt-key add /docker/raspberrypi.gpg.key
 
 RUN apt-get update && \
     apt-get -y install wget oracle-java8-jdk && \
