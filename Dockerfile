@@ -24,4 +24,4 @@ WORKDIR /mehrnebel/machine
 
 ADD docker/production.json /mehrnebel/machine/production.json
 
-CMD ["sudo java", "-classpath", ".:classes:/opt/pi4j/lib/'*'", "-jar", "/mehrnebel/machine/app.jar", "-conf", "/mehrnebel/machine/production.json"]
+CMD ["java", "-classpath", ".:classes:/opt/pi4j/lib/'*'", "-jar", "/mehrnebel/machine/app.jar", "-conf", "/mehrnebel/machine/production.json"]
