@@ -10,9 +10,6 @@ RUN apt-get update && \
     apt-get -y install wget oracle-java8-jdk && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN wget http://get.pi4j.com/download/pi4j-1.1.deb && \
-    sudo dpkg -i pi4j-1.1.deb
-
 COPY . /usr/src/app
 
 WORKDIR /usr/src/app
@@ -27,5 +24,4 @@ WORKDIR /mehrnebel/machine
 
 ADD docker/production.json /mehrnebel/machine/production.json
 
-ENTRYPOINT ["java", "-classpath", ".:classes:/opt/pi4j/lib/'*'", "-jar", "/mehrnebel/machine/app.jar"]
-CMD ["-conf", "/mehrnebel/machine/production.json"]
+CMD ["sudo java", "-classpath", ".:classes:/opt/pi4j/lib/'*'", "-jar", "/mehrnebel/machine/app.jar", "-conf", "/mehrnebel/machine/production.json"]
