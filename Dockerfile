@@ -5,6 +5,8 @@ COPY . /usr/src/app
 
 WORKDIR /usr/src/app
 
+RUN sudo apt-get install ca-certificates-java
+
 RUN ./gradlew build shadowJar
 
 FROM resin/raspberry-pi-openjdk:8-jre as machine
