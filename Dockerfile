@@ -5,7 +5,8 @@ COPY . /usr/src/app
 
 WORKDIR /usr/src/app
 
-RUN sudo apt-get install ca-certificates-java
+RUN sudo apt-get update && \
+    sudo apt-get install ca-certificates-java
 
 RUN ./gradlew build shadowJar
 
