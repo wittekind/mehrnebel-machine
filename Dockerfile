@@ -1,12 +1,14 @@
-FROM resin/rpi-raspbian:stretch as builder
+FROM resin/rpi-raspbian:jessie as builder
 MAINTAINER daniel@wittekind.io
 
-RUN apt-key adv --recv-key --keyserver keyserver.ubuntu.com EEA14886 && \
-    echo 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main' && \
-    echo 'deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main' && \
-    apt-get update && \
-    apt-get -y install oracle-java8-installer oracle-java8-set-default && \
-    source /etc/profile
+COPY docker/raspberrypi.gpg.key /key/
+RUN echo 'deb http://archive.raspberrypi.org/debian/ jessie main' >> /etc/apt/sources.list.d/raspi.list && \
+    echo oracle-java8-jdk shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+    apt-key add /key/raspberrypi.gpg.key
+
+RUN apt-get update && \
+    apt-get -y install oracle-java8-jdk && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY . /usr/src/app
 
@@ -14,11 +16,11 @@ WORKDIR /usr/src/app
 
 RUN ./gradlew build shadowJar
 
-FROM resin/rpi-raspbian as machine
+FROM resin/rpi-raspbian:jessie as machine
 MAINTAINER daniel@wittekind.io
 
 COPY docker/raspberrypi.gpg.key /key/
-RUN echo 'deb http://archive.raspberrypi.org/debian/ wheezy main' >> /etc/apt/sources.list.d/raspi.list && \
+RUN echo 'deb http://archive.raspberrypi.org/debian/ jessie main' >> /etc/apt/sources.list.d/raspi.list && \
     echo oracle-java8-jdk shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
     apt-key add /key/raspberrypi.gpg.key
 
