@@ -1,17 +1,32 @@
-FROM resin/raspberry-pi-openjdk:8-jdk as builder
+FROM resin/rpi-raspbian as builder
 MAINTAINER daniel@wittekind.io
+
+COPY docker/raspberrypi.gpg.key /key/
+RUN echo 'deb http://archive.raspberrypi.org/debian/ wheezy main' >> /etc/apt/sources.list.d/raspi.list && \
+    echo oracle-java8-jdk shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+    apt-key add /key/raspberrypi.gpg.key
+
+RUN apt-get update && \
+    apt-get -y install wget oracle-java8-jdk && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY . /usr/src/app
 
 WORKDIR /usr/src/app
 
-RUN sudo apt-get update && \
-    sudo apt-get install ca-certificates-java
-
 RUN ./gradlew build shadowJar
 
-FROM resin/raspberry-pi-openjdk:8-jre as machine
+FROM resin/rpi-raspbian as machine
 MAINTAINER daniel@wittekind.io
+
+COPY docker/raspberrypi.gpg.key /key/
+RUN echo 'deb http://archive.raspberrypi.org/debian/ wheezy main' >> /etc/apt/sources.list.d/raspi.list && \
+    echo oracle-java8-jdk shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+    apt-key add /key/raspberrypi.gpg.key
+
+RUN apt-get update && \
+    apt-get -y install wget oracle-java8-jre && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /mehrnebel/machine
 
