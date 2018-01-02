@@ -33,7 +33,7 @@ class MainVerticle : AbstractVerticle() {
         val mqttVerticle = MqttVerticle()
 
         launch(CommonPool) {
-            //vertx.deployVerticleInstance(gpioVerticle, DeploymentOptions().setConfig(config()))
+            vertx.deployVerticleInstance(gpioVerticle, DeploymentOptions().setConfig(config()))
             vertx.deployVerticleInstance(machineVerticle, DeploymentOptions().setConfig(config()))
             vertx.deployVerticleInstance(mqttVerticle, DeploymentOptions().setConfig(config()))
 

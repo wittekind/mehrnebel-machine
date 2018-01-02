@@ -1,11 +1,15 @@
 package io.wittekind.mehrnebel.machine.mqtt
 
+import com.amazonaws.services.iot.client.AWSIotMessage
 import com.amazonaws.services.iot.client.AWSIotMqttClient
+import com.amazonaws.services.iot.client.AWSIotQos
 import io.vertx.rxjava.core.AbstractVerticle
+import io.wittekind.mehrnebel.machine.FOG_TRIGGER_TOPIC
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
+import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.math.BigInteger
 import java.security.KeyStore
@@ -17,6 +21,10 @@ import java.security.cert.CertificateFactory
 import java.util.*
 
 internal class MqttVerticle : AbstractVerticle() {
+
+    private val logger by lazy {
+        LoggerFactory.getLogger(MqttVerticle::class.java)
+    }
 
     val awsIotMqttClient: AWSIotMqttClient by lazy {
         val endpoint = System.getenv(ENV_ENDPOINT)
@@ -31,6 +39,16 @@ internal class MqttVerticle : AbstractVerticle() {
 
     override fun start() {
         awsIotMqttClient.connect()
+        awsIotMqttClient.subscribe(FogTopic(TOPIC, {message -> onMessage(message)}, AWSIotQos.QOS0 ))
+    }
+
+    fun onMessage(message: AWSIotMessage?) {
+        if (message == null) {
+            return
+        }
+        val payload = String(message.payload)
+        logger.info("new message: [$payload]")
+        vertx.eventBus().publish(FOG_TRIGGER_TOPIC, true)
     }
 
     fun loadKeyStorePasswordPair(pkLiteral: String, certLiteral: String): KeyStorePasswordPair {
@@ -60,6 +78,6 @@ internal class MqttVerticle : AbstractVerticle() {
     fun loadCertificates(certBase64: String): List<Certificate> {
         val certFactory = CertificateFactory.getInstance("X.509")
         val certStream = ByteArrayInputStream(Base64.getDecoder().decode(certBase64))
-        return certFactory.generateCertificates(certStream) as List<Certificate>
+        return certFactory.generateCertificates(certStream).filterIsInstance<Certificate>()
     }
 }
