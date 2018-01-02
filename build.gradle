@@ -24,7 +24,9 @@ def versions = [
         slf4j  : '1.7.25',
         log4j  : '2.8.2',
         kotlin : '1.1.61',
-        pi4j : '1.2-SNAPSHOT'
+        pi4j : '1.2-SNAPSHOT',
+        awsIot : '1.1.1',
+        bc     : '1.58'
 ]
 
 repositories {
@@ -62,6 +64,11 @@ dependencies {
     compile "org.apache.logging.log4j:log4j-slf4j-impl:$versions.log4j"
     compile "org.apache.logging.log4j:log4j-api:$versions.log4j"
     compile "org.apache.logging.log4j:log4j-core:$versions.log4j"
+
+    compile "com.amazonaws:aws-iot-device-sdk-java:$versions.awsIot"
+
+    compile "org.bouncycastle:bcprov-jdk15on:$versions.bc"
+    compile "org.bouncycastle:bcpkix-jdk15on:$versions.bc"
 }
 
 // ShadowJar
