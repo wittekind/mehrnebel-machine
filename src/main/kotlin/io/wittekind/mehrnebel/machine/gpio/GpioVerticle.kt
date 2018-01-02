@@ -55,18 +55,17 @@ internal class GpioVerticle : AbstractVerticle() {
 
     private fun triggerFog() {
         logger.info("triggering fog")
-        startFog()
-        resetTime = OffsetDateTime.now().plusSeconds(1L)
         if (isIdle) {
-            startDelayedFogStop(1000L)
+            startDelayedFogStop(2000L)
         }
+        resetTime = OffsetDateTime.now().plusSeconds(2L)
+        startFog()
     }
 
     private fun startDelayedFogStop(runtime: Long) {
         logger.info("scheduling delay: [$runtime]")
         fogTimer.schedule(runtime) {
             if (OffsetDateTime.now().isBefore(resetTime)) {
-                isIdle = false
                 val remainingTime = OffsetDateTime.now().minusSeconds(resetTime.toEpochSecond()).toEpochSecond()
                 if (remainingTime > 0) {
                     startDelayedFogStop(remainingTime * 1000)
@@ -80,6 +79,7 @@ internal class GpioVerticle : AbstractVerticle() {
     private fun startFog() {
         logger.info("starting Fog")
         fogTogglePin.setState(true)
+        isIdle = false
     }
 
     private fun stopFog() {
