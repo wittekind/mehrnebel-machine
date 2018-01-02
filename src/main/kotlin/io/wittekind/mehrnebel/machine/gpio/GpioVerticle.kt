@@ -4,8 +4,8 @@ import com.pi4j.io.gpio.GpioFactory
 import com.pi4j.io.gpio.PinState
 import com.pi4j.io.gpio.RaspiPin
 import io.vertx.rxjava.core.AbstractVerticle
+import io.wittekind.mehrnebel.machine.FOG_CONTROL_TOPIC
 import io.wittekind.mehrnebel.machine.FOG_TRIGGER_TOPIC
-import io.wittekind.mehrnebel.machine.GPIO_LED_TOPIC
 import io.wittekind.mehrnebel.machine.asyncHandler
 import org.slf4j.LoggerFactory
 import java.time.OffsetDateTime
@@ -34,14 +34,17 @@ internal class GpioVerticle : AbstractVerticle() {
     }
 
     override fun start() {
+        fogTogglePin.setState(false)
 
-        val led = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_00, "TestLed", PinState.LOW)
-
-        vertx.eventBus().consumer<Boolean>(GPIO_LED_TOPIC)
+        vertx.eventBus().consumer<Boolean>(FOG_CONTROL_TOPIC)
                 .asyncHandler {
                     val newPinState = it.body()
-                    logger.info("received new pin state [${newPinState}]")
-                    led.setState(newPinState)
+                    logger.info("setting new fog state [$newPinState]")
+                    if (newPinState) {
+                        startFog()
+                    } else {
+                        stopFog()
+                    }
                 }
 
         vertx.eventBus().consumer<Boolean>(FOG_TRIGGER_TOPIC)
@@ -64,8 +67,10 @@ internal class GpioVerticle : AbstractVerticle() {
         fogTimer.schedule(runtime) {
             if (OffsetDateTime.now().isBefore(resetTime)) {
                 isIdle = false
-                val remainingTime = OffsetDateTime.now().minusSeconds(resetTime.toEpochSecond())
-                startDelayedFogStop(remainingTime.toEpochSecond() * 1000)
+                val remainingTime = OffsetDateTime.now().minusSeconds(resetTime.toEpochSecond()).toEpochSecond()
+                if (remainingTime > 0) {
+                    startDelayedFogStop(remainingTime * 1000)
+                }
             } else {
                 stopFog()
             }

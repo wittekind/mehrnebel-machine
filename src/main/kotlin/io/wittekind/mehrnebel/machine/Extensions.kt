@@ -11,7 +11,7 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.rx1.await
 import kotlinx.coroutines.experimental.rx1.awaitFirst
 
-val GPIO_LED_TOPIC = "gpio.led"
+val FOG_CONTROL_TOPIC = "gpio.led"
 val FOG_TRIGGER_TOPIC = "fog.trigger"
 
 fun io.vertx.rxjava.ext.web.Route.asyncHandler(handle: suspend (io.vertx.rxjava.ext.web.RoutingContext) -> Unit) {
