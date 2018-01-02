@@ -8,14 +8,12 @@ import io.wittekind.mehrnebel.machine.FOG_CONTROL_TOPIC
 import io.wittekind.mehrnebel.machine.FOG_TRIGGER_TOPIC
 import io.wittekind.mehrnebel.machine.asyncHandler
 import org.slf4j.LoggerFactory
-import java.time.OffsetDateTime
 import java.util.*
 import kotlin.concurrent.schedule
 
 internal class GpioVerticle : AbstractVerticle() {
 
-    var isIdle: Boolean = true
-    var resetTime: OffsetDateTime = OffsetDateTime.now()
+    private var stopTask : TimerTask? = null
 
     private val fogTimer by lazy {
         Timer("fogTimer")
@@ -55,25 +53,15 @@ internal class GpioVerticle : AbstractVerticle() {
 
     private fun triggerFog() {
         logger.info("triggering fog")
-        resetTime = OffsetDateTime.now().plusSeconds(2L)
-        if (isIdle) {
-            startDelayedFogStop(2000L)
-        }
-        isIdle = false
         startFog()
+        restartDelayedFogStop()
     }
 
-    private fun startDelayedFogStop(runtime: Long) {
-        logger.info("scheduling delay: [$runtime]")
-        fogTimer.schedule(runtime) {
-            if (OffsetDateTime.now().isBefore(resetTime)) {
-                val remainingTime = OffsetDateTime.now().minusSeconds(resetTime.toEpochSecond()).toEpochSecond()
-                if (remainingTime > 0) {
-                    startDelayedFogStop(remainingTime * 1000)
-                }
-            } else {
-                stopFog()
-            }
+    private fun restartDelayedFogStop() {
+        stopTask?.cancel()
+
+        stopTask = fogTimer.schedule(2000) {
+            stopFog()
         }
     }
 
@@ -85,6 +73,5 @@ internal class GpioVerticle : AbstractVerticle() {
     private fun stopFog() {
         logger.info("stopping Fog")
         fogTogglePin.setState(false)
-        isIdle = true
     }
 }
