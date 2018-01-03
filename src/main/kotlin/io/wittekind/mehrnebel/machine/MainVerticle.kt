@@ -33,20 +33,28 @@ class MainVerticle : AbstractVerticle() {
         val mqttVerticle = MqttVerticle()
 
         launch(CommonPool) {
-            vertx.deployVerticleInstance(gpioVerticle, DeploymentOptions().setConfig(config()))
-            vertx.deployVerticleInstance(machineVerticle, DeploymentOptions().setConfig(config()))
-            vertx.deployVerticleInstance(mqttVerticle, DeploymentOptions().setConfig(config()))
-
             logger.info("Starting http server...")
             val port = config().getInteger("http.port", 8060)
             try {
+                deployVerticles(DeploymentOptions().setConfig(config()),
+                        gpioVerticle,
+                        machineVerticle,
+                        mqttVerticle)
+
                 vertx.createHttpServer()
                         .requestHandler { router.accept(it) }
                         .asyncListen(port)
                 logger.info("Started http server on port [{}].", port)
+                startFuture.complete()
             } catch (e: Exception) {
                 startFuture.fail(e)
             }
         }
     }
+    private suspend fun deployVerticles(options: DeploymentOptions, vararg verticles: AbstractVerticle) {
+        verticles.forEach {
+            vertx.deployVerticleInstance(it, options)
+        }
+    }
+
 }
