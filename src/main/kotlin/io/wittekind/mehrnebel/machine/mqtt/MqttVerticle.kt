@@ -1,7 +1,7 @@
 package io.wittekind.mehrnebel.machine.mqtt
 
+import com.amazonaws.services.iot.client.AWSIotConfig
 import com.amazonaws.services.iot.client.AWSIotMessage
-import com.amazonaws.services.iot.client.AWSIotMqttClient
 import com.amazonaws.services.iot.client.AWSIotQos
 import io.vertx.rxjava.core.AbstractVerticle
 import io.wittekind.mehrnebel.machine.FOG_TRIGGER_TOPIC
@@ -26,7 +26,7 @@ internal class MqttVerticle : AbstractVerticle() {
         LoggerFactory.getLogger(MqttVerticle::class.java)
     }
 
-    val awsIotMqttClient: AWSIotMqttClient by lazy {
+    private val awsIotMqttClient: MehrNebelMqttClient by lazy {
         val endpoint = System.getenv(ENV_ENDPOINT)
         val clientId = System.getenv(ENV_CLIENT_ID)
         val privateKeyLiteral = System.getenv(ENV_PRIVATE_KEY)
@@ -34,15 +34,19 @@ internal class MqttVerticle : AbstractVerticle() {
 
         val keyStorePwPair = loadKeyStorePasswordPair(privateKeyLiteral, certificateLiteral)
 
-        AWSIotMqttClient(endpoint, clientId, keyStorePwPair.keyStore, keyStorePwPair.keyPassword)
+        MehrNebelMqttClient(endpoint, clientId, keyStorePwPair.keyStore, keyStorePwPair.keyPassword)
     }
 
-    override fun start() {
-        awsIotMqttClient.connect()
-        awsIotMqttClient.subscribe(FogTopic(TOPIC, {message -> onMessage(message)}, AWSIotQos.QOS0 ))
+    override fun start(startFuture: io.vertx.core.Future<Void>?) {
+        awsIotMqttClient.setOnConnectionSuccessCallback {
+            awsIotMqttClient.subscribe(FogTopic(TOPIC, {message -> onMessage(message)}, AWSIotQos.QOS0 ))
+            startFuture?.complete()
+        }
+        awsIotMqttClient.connect(AWSIotConfig.CONNECTION_TIMEOUT.toLong(), false)
     }
 
-    fun onMessage(message: AWSIotMessage?) {
+
+    private fun onMessage(message: AWSIotMessage?) {
         if (message == null) {
             return
         }
@@ -51,7 +55,7 @@ internal class MqttVerticle : AbstractVerticle() {
         vertx.eventBus().publish(FOG_TRIGGER_TOPIC, true)
     }
 
-    fun loadKeyStorePasswordPair(pkLiteral: String, certLiteral: String): KeyStorePasswordPair {
+    private fun loadKeyStorePasswordPair(pkLiteral: String, certLiteral: String): KeyStorePasswordPair {
         Security.addProvider(org.bouncycastle.jce.provider.BouncyCastleProvider())
         val privateKey = createPrivateKey(pkLiteral)
         val certificates = loadCertificates(certLiteral)
@@ -64,7 +68,7 @@ internal class MqttVerticle : AbstractVerticle() {
         return KeyStorePasswordPair(keystore, keyPassword)
     }
 
-    fun createPrivateKey(pkBase64: String): PrivateKey {
+    private fun createPrivateKey(pkBase64: String): PrivateKey {
         val pemParser = PEMParser(ByteArrayInputStream(Base64.getDecoder().decode(pkBase64)).reader())
 
         val ecOID = pemParser.readObject() as ASN1ObjectIdentifier
@@ -75,7 +79,7 @@ internal class MqttVerticle : AbstractVerticle() {
         return pair.private
     }
 
-    fun loadCertificates(certBase64: String): List<Certificate> {
+    private fun loadCertificates(certBase64: String): List<Certificate> {
         val certFactory = CertificateFactory.getInstance("X.509")
         val certStream = ByteArrayInputStream(Base64.getDecoder().decode(certBase64))
         return certFactory.generateCertificates(certStream).filterIsInstance<Certificate>()
