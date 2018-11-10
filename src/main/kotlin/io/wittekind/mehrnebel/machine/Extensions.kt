@@ -13,6 +13,7 @@ import kotlinx.coroutines.experimental.rx1.awaitFirst
 
 val FOG_CONTROL_TOPIC = "gpio.led"
 val FOG_TRIGGER_TOPIC = "fog.trigger"
+val FOGGER_ADDRESS_TOPIC = "fogger.url"
 
 fun io.vertx.rxjava.ext.web.Route.asyncHandler(handle: suspend (io.vertx.rxjava.ext.web.RoutingContext) -> Unit) {
     handler { routingContext ->

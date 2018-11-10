@@ -5,7 +5,7 @@ import io.vertx.core.Future
 import io.vertx.rxjava.core.AbstractVerticle
 import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.handler.BodyHandler
-import io.wittekind.mehrnebel.machine.gpio.GpioVerticle
+import io.wittekind.mehrnebel.machine.artnet.ArtnetVerticle
 import io.wittekind.mehrnebel.machine.machine.MachineVerticle
 import io.wittekind.mehrnebel.machine.mqtt.MqttVerticle
 import io.wittekind.mehrnebel.machine.util.FailureHandler
@@ -29,17 +29,17 @@ class MainVerticle : AbstractVerticle() {
         logger.info("Deploying verticles...")
 
         val machineVerticle = MachineVerticle(router)
-        val gpioVerticle = GpioVerticle()
         val mqttVerticle = MqttVerticle()
+        val artnetVerticle = ArtnetVerticle()
 
         launch(CommonPool) {
             logger.info("Starting http server...")
             val port = config().getInteger("http.port", 8060)
             try {
                 deployVerticles(DeploymentOptions().setConfig(config()),
-                        gpioVerticle,
                         machineVerticle,
-                        mqttVerticle)
+                        mqttVerticle,
+                        artnetVerticle)
 
                 vertx.createHttpServer()
                         .requestHandler { router.accept(it) }

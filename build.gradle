@@ -24,7 +24,6 @@ def versions = [
         slf4j  : '1.7.25',
         log4j  : '2.8.2',
         kotlin : '1.1.61',
-        pi4j : '1.2-SNAPSHOT',
         awsIot : '1.1.1',
         bc     : '1.58'
 ]
@@ -58,8 +57,6 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-annotations:$versions.vertx.jackson"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:$versions.vertx.jackson"
 
-    compile "com.pi4j:pi4j-core:$versions.pi4j"
-
     compile "org.slf4j:slf4j-api:$versions.slf4j"
     compile "org.apache.logging.log4j:log4j-slf4j-impl:$versions.log4j"
     compile "org.apache.logging.log4j:log4j-api:$versions.log4j"
@@ -69,6 +66,8 @@ dependencies {
 
     compile "org.bouncycastle:bcprov-jdk15on:$versions.bc"
     compile "org.bouncycastle:bcpkix-jdk15on:$versions.bc"
+
+    compile files('libs/artnet4j.jar')
 }
 
 // ShadowJar
