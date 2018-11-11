@@ -37,8 +37,8 @@ internal class MachineVerticle(router: Router) : AbstractVerticle() {
     }
 
     private suspend fun setMachineAddress(routingContext: RoutingContext) {
-        val request = routingContext.decodeBody<UpdateMachineAddressRequest>()
-        vertx.eventBus().publish(FOGGER_ADDRESS_TOPIC, request.foggerUrl)
+        val request = routingContext.decodeBody<UpdateArtnetNodeAddressRequest>()
+        vertx.eventBus().publish(NODE_ADDRESS_TOPIC, request.nodeAddress)
 
         routingContext.response()
                 .setStatusCode(204)

@@ -2,9 +2,9 @@ package io.wittekind.mehrnebel.machine.artnet
 
 import ch.bildspur.artnet.ArtNetClient
 import io.vertx.rxjava.core.AbstractVerticle
-import io.wittekind.mehrnebel.machine.FOGGER_ADDRESS_TOPIC
 import io.wittekind.mehrnebel.machine.FOG_CONTROL_TOPIC
 import io.wittekind.mehrnebel.machine.FOG_TRIGGER_TOPIC
+import io.wittekind.mehrnebel.machine.NODE_ADDRESS_TOPIC
 import io.wittekind.mehrnebel.machine.asyncHandler
 import org.slf4j.LoggerFactory
 import java.net.InetAddress
@@ -14,7 +14,7 @@ import kotlin.concurrent.schedule
 internal class ArtnetVerticle: AbstractVerticle() {
     private var stopTask : TimerTask? = null
 
-    private var foggerAddress : InetAddress = InetAddress.getByName("127.0.0.1")
+    private var nodeAddress : InetAddress = InetAddress.getByName("192.168.111.108")
 
     private val fogTimer by lazy {
         Timer("fogTimer")
@@ -31,13 +31,13 @@ internal class ArtnetVerticle: AbstractVerticle() {
     override fun start() {
         // TODO turn off
         artnet.start()
-        artnet.unicastDmx(foggerAddress, 0, 0, byteArrayOf(0.toByte()))
+        artnet.unicastDmx(nodeAddress, 0, 0, byteArrayOf(0.toByte()))
 
-        vertx.eventBus().consumer<String>(FOGGER_ADDRESS_TOPIC)
+        vertx.eventBus().consumer<String>(NODE_ADDRESS_TOPIC)
                 .asyncHandler {
                     val newFoggerAddress = it.body()
-                    logger.info("setting new fogger address [$newFoggerAddress]")
-                    foggerAddress = InetAddress.getByName(newFoggerAddress)
+                    logger.info("setting new artnet node address [$newFoggerAddress]")
+                    nodeAddress = InetAddress.getByName(newFoggerAddress)
                 }
 
         vertx.eventBus().consumer<Boolean>(FOG_CONTROL_TOPIC)
@@ -72,12 +72,12 @@ internal class ArtnetVerticle: AbstractVerticle() {
     }
 
     private fun startFog() {
-        logger.info("starting Fog")
-        artnet.unicastDmx(foggerAddress, 0, 0, byteArrayOf(0xAA.toByte()))
+        logger.info("starting Fog at [$nodeAddress]")
+        artnet.unicastDmx(nodeAddress, 0, 0, byteArrayOf(0xAA.toByte(), 0xAA.toByte(), 0xAA.toByte()))
     }
 
     private fun stopFog() {
-        logger.info("stopping Fog")
-        artnet.unicastDmx(foggerAddress, 0, 0, byteArrayOf(0.toByte()))
+        logger.info("stopping Fog at [$nodeAddress]")
+        artnet.unicastDmx(nodeAddress, 0, 0, byteArrayOf(0.toByte()))
     }
 }
