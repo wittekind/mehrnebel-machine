@@ -1,4 +1,4 @@
-package io.wittekind.mehrnebel.machine.mqtt
+package io.wittekind.mehrnebel.fogger.mqtt
 
 import java.security.KeyStore
 

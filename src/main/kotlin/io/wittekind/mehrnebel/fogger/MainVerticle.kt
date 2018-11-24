@@ -1,14 +1,14 @@
-package io.wittekind.mehrnebel.machine
+package io.wittekind.mehrnebel.fogger
 
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.Future
 import io.vertx.rxjava.core.AbstractVerticle
 import io.vertx.rxjava.ext.web.Router
 import io.vertx.rxjava.ext.web.handler.BodyHandler
-import io.wittekind.mehrnebel.machine.artnet.ArtnetVerticle
-import io.wittekind.mehrnebel.machine.machine.MachineVerticle
-import io.wittekind.mehrnebel.machine.mqtt.MqttVerticle
-import io.wittekind.mehrnebel.machine.util.FailureHandler
+import io.wittekind.mehrnebel.fogger.artnet.ArtnetVerticle
+import io.wittekind.mehrnebel.fogger.http.HttpVerticle
+import io.wittekind.mehrnebel.fogger.mqtt.MqttVerticle
+import io.wittekind.mehrnebel.fogger.util.FailureHandler
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.launch
 import org.slf4j.LoggerFactory
@@ -28,7 +28,7 @@ class MainVerticle : AbstractVerticle() {
 
         logger.info("Deploying verticles...")
 
-        val machineVerticle = MachineVerticle(router)
+        val machineVerticle = HttpVerticle(router)
         val mqttVerticle = MqttVerticle()
         val artnetVerticle = ArtnetVerticle()
 

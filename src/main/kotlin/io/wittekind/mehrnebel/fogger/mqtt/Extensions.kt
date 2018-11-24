@@ -1,4 +1,4 @@
-package io.wittekind.mehrnebel.machine.mqtt
+package io.wittekind.mehrnebel.fogger.mqtt
 
 val ENV_CLIENT_ID = "AWS_IOT_CLIENT_ID"
 val ENV_ENDPOINT = "AWS_IOT_ENDPOINT"

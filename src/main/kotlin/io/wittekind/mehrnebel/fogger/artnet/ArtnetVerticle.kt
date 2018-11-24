@@ -1,11 +1,8 @@
-package io.wittekind.mehrnebel.machine.artnet
+package io.wittekind.mehrnebel.fogger.artnet
 
 import ch.bildspur.artnet.ArtNetClient
 import io.vertx.rxjava.core.AbstractVerticle
-import io.wittekind.mehrnebel.machine.FOG_CONTROL_TOPIC
-import io.wittekind.mehrnebel.machine.FOG_TRIGGER_TOPIC
-import io.wittekind.mehrnebel.machine.NODE_ADDRESS_TOPIC
-import io.wittekind.mehrnebel.machine.asyncHandler
+import io.wittekind.mehrnebel.fogger.*
 import org.slf4j.LoggerFactory
 import java.net.InetAddress
 import java.util.*
@@ -14,6 +11,7 @@ import kotlin.concurrent.schedule
 internal class ArtnetVerticle: AbstractVerticle() {
     private var stopTask : TimerTask? = null
 
+    private var foggerDmxAddress : Int = 0
     private var nodeAddress : InetAddress = InetAddress.getByName("192.168.111.108")
 
     private val fogTimer by lazy {
@@ -29,9 +27,7 @@ internal class ArtnetVerticle: AbstractVerticle() {
     }
 
     override fun start() {
-        // TODO turn off
         artnet.start()
-        artnet.unicastDmx(nodeAddress, 0, 0, byteArrayOf(0.toByte()))
 
         vertx.eventBus().consumer<String>(NODE_ADDRESS_TOPIC)
                 .asyncHandler {
@@ -40,21 +36,28 @@ internal class ArtnetVerticle: AbstractVerticle() {
                     nodeAddress = InetAddress.getByName(newFoggerAddress)
                 }
 
-        vertx.eventBus().consumer<Boolean>(FOG_CONTROL_TOPIC)
+        vertx.eventBus().consumer<Int>(FOG_ADDRESS)
                 .asyncHandler {
-                    val newPinState = it.body()
-                    logger.info("setting new fog state [$newPinState]")
-                    if (newPinState) {
-                        startFog()
-                    } else {
-                        stopFog()
-                    }
+                    foggerDmxAddress = it.body()
+                    logger.info("set new fogger dmx address [$foggerDmxAddress]")
+                }
+
+        vertx.eventBus().consumer<Byte>(FOG_CONTROL_TOPIC)
+                .asyncHandler {
+                    val fogIntensity = it.body()
+                    logger.info("setting new fog intensity [$fogIntensity]")
+                    startFog(fogIntensity)
                 }
 
         vertx.eventBus().consumer<Boolean>(FOG_TRIGGER_TOPIC)
                 .asyncHandler {
                     triggerFog()
                 }
+    }
+
+    override fun stop() {
+        artnet.stop()
+        super.stop()
     }
 
     private fun triggerFog() {
@@ -71,13 +74,15 @@ internal class ArtnetVerticle: AbstractVerticle() {
         }
     }
 
-    private fun startFog() {
-        logger.info("starting Fog at [$nodeAddress]")
-        artnet.unicastDmx(nodeAddress, 0, 0, byteArrayOf(0xAA.toByte(), 0xAA.toByte(), 0xAA.toByte()))
+    private fun startFog(intensity: Byte = 255.toByte()) {
+        logger.info("starting Fog at [$nodeAddress] dmx:[$foggerDmxAddress]")
+        val dmxValues = ByteArray(512)
+        dmxValues[foggerDmxAddress] = intensity
+        artnet.unicastDmx(nodeAddress, 0, 0, dmxValues)
     }
 
     private fun stopFog() {
-        logger.info("stopping Fog at [$nodeAddress]")
-        artnet.unicastDmx(nodeAddress, 0, 0, byteArrayOf(0.toByte()))
+        logger.info("stopping Fog at [$nodeAddress] dmx:[$foggerDmxAddress]")
+        artnet.unicastDmx(nodeAddress, 0, 0, ByteArray(512))
     }
 }

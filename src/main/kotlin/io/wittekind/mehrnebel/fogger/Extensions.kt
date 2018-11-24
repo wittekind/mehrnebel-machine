@@ -1,4 +1,4 @@
-package io.wittekind.mehrnebel.machine
+package io.wittekind.mehrnebel.fogger
 
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.json.Json
@@ -11,9 +11,10 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.rx1.await
 import kotlinx.coroutines.experimental.rx1.awaitFirst
 
-val FOG_CONTROL_TOPIC = "gpio.led"
+val FOG_CONTROL_TOPIC = "fog.set"
 val FOG_TRIGGER_TOPIC = "fog.trigger"
-val NODE_ADDRESS_TOPIC = "fogger.url"
+val FOG_ADDRESS = "fog.address"
+val NODE_ADDRESS_TOPIC = "artnet.url"
 
 fun io.vertx.rxjava.ext.web.Route.asyncHandler(handle: suspend (io.vertx.rxjava.ext.web.RoutingContext) -> Unit) {
     handler { routingContext ->

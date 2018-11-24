@@ -1,4 +1,4 @@
-package io.wittekind.mehrnebel.machine.mqtt
+package io.wittekind.mehrnebel.fogger.mqtt
 
 import com.amazonaws.services.iot.client.AWSIotMqttClient
 import org.slf4j.LoggerFactory

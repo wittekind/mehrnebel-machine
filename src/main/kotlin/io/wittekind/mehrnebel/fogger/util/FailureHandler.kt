@@ -1,11 +1,11 @@
-package io.wittekind.mehrnebel.machine.util
+package io.wittekind.mehrnebel.fogger.util
 
 import io.vertx.core.Handler
 import io.vertx.core.http.HttpHeaders
 import io.vertx.core.json.DecodeException
 import io.vertx.core.json.Json
 import io.vertx.rxjava.ext.web.RoutingContext
-import io.wittekind.mehrnebel.machine.putHeader
+import io.wittekind.mehrnebel.fogger.putHeader
 import org.slf4j.LoggerFactory
 
 class FailureHandler : Handler<RoutingContext> {

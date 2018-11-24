@@ -1,4 +1,4 @@
-package io.wittekind.mehrnebel.machine.machine
+package io.wittekind.mehrnebel.fogger.http
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty

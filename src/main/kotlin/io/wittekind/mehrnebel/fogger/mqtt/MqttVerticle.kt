@@ -1,10 +1,10 @@
-package io.wittekind.mehrnebel.machine.mqtt
+package io.wittekind.mehrnebel.fogger.mqtt
 
 import com.amazonaws.services.iot.client.AWSIotConfig
 import com.amazonaws.services.iot.client.AWSIotMessage
 import com.amazonaws.services.iot.client.AWSIotQos
 import io.vertx.rxjava.core.AbstractVerticle
-import io.wittekind.mehrnebel.machine.FOG_TRIGGER_TOPIC
+import io.wittekind.mehrnebel.fogger.FOG_TRIGGER_TOPIC
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
