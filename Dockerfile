@@ -16,7 +16,7 @@ WORKDIR /usr/src/app
 
 RUN ./gradlew build shadowJar
 
-FROM resin/rpi-raspbian:jessie as machine
+FROM resin/rpi-raspbian:jessie as fogger
 MAINTAINER daniel@wittekind.io
 
 COPY docker/raspberrypi.gpg.key /key/
@@ -28,10 +28,10 @@ RUN apt-get update && \
     apt-get -y install oracle-java8-jdk && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /mehrnebel/machine
+WORKDIR /mehrnebel/artnet-fogger
 
-COPY --from=builder /usr/src/app/build/libs/machine-0.0.1-fat.jar /mehrnebel/machine/app.jar
+COPY --from=builder /usr/src/app/build/libs/artnet-fogger-0.0.1-fat.jar /mehrnebel/artnet-fogger/app.jar
 
-ADD docker/production.json /mehrnebel/machine/production.json
+ADD docker/production.json /mehrnebel/artnet-fogger/production.json
 
-CMD ["java", "-jar", "/mehrnebel/machine/app.jar", "-conf", "/mehrnebel/machine/production.json"]
+CMD ["java", "-jar", "/mehrnebel/artnet-fogger/app.jar", "-conf", "/mehrnebel/artnet-fogger/production.json"]
