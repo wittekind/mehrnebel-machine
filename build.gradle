@@ -73,7 +73,7 @@ dependencies {
 // ShadowJar
 
 mainClassName = 'io.vertx.core.Launcher'
-def mainVerticle = "io.wittekind.mehrnebel.http.MainVerticle"
+def mainVerticle = "io.wittekind.mehrnebel.fogger.MainVerticle"
 
 defaultTasks 'shadowJar'
 
