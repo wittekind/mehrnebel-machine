@@ -44,7 +44,7 @@ class MainVerticle : AbstractVerticle() {
                 vertx.createHttpServer()
                         .requestHandler { router.accept(it) }
                         .asyncListen(port)
-                logger.info("Started http server on port [{}].", port)
+                logger.info("Started HTTP server on port [{}].", port)
                 startFuture.complete()
             } catch (e: Exception) {
                 startFuture.fail(e)
